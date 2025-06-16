@@ -2,12 +2,22 @@ import { Emitter } from "./eventEmitter/eventEmitter.ts";
 import { ScrollObserver } from "./scrollObserver/scrollObserver.ts";
 import { SequenceManager } from "./sequenceManager/sequenceManager.ts";
 
-// Technical explanation
-// The Emitter(), serve us to send scroll position from ScrollObserver
-// to SequenceManager and to sync scroll position to SequenceManager
-export class ScrollTroughStory {
+/**
+ * Technical explanation
+ * Manages a scroll-based animation sequence on a canvas element.
+ * @param canvas The canvas element or its selector.
+ * @param desktopUrl URL for desktop sequence images.
+ * @param mobileUrl URL for mobile sequence images.
+ * @param startFrameNumber Starting frame index.
+ * @param endFrameNumber Ending frame index.
+ * @param scrollTrigger The scroll trigger element or its selector.
+ * @param triggerStart Scroll trigger start position.
+ * @param triggerEnd Scroll trigger end position.
+ */
+
+export class ScrollThroughStory {
   canvas: HTMLCanvasElement | string;
-  emitter: any;
+  emitter: Emitter;
   scrollObserver: any;
   scrollTrigger: HTMLElement | string;
   sequenceManager: any;
@@ -41,84 +51,54 @@ export class ScrollTroughStory {
     this.init();
   }
 
-  getScrubTrigger(trigger: HTMLElement | string): HTMLElement {
-    let triggerDomElement: HTMLElement;
-    if (trigger instanceof HTMLElement) {
-      triggerDomElement = trigger;
-    } else {
-      if (typeof trigger == "string") {
-        let item = document.querySelector(trigger);
-        if (
-          item == undefined ||
-          item == null ||
-          !(item instanceof HTMLElement)
-        ) {
-          throw new Error(`Cannot find you scroll trigger element: ${trigger}`);
-        } else {
-          triggerDomElement = item;
-        }
-      } else {
-        throw new Error(`Can't find your trigger element: ${trigger}`);
-      }
+  private getScrubTrigger(trigger: HTMLElement | string): HTMLElement {
+    if (trigger instanceof HTMLElement) return trigger;
+    const element = document.querySelector(trigger);
+    if (!(element instanceof HTMLElement)) {
+      throw new Error(`Cannot find scroll trigger element: ${trigger}`);
     }
-    return triggerDomElement;
+    return element;
   }
 
-  getCanvas(canvas: HTMLCanvasElement | String): HTMLCanvasElement {
-    let canvasDom: HTMLCanvasElement;
-    if (canvas instanceof HTMLCanvasElement) {
-      canvasDom = canvas;
-    } else {
-      if (typeof canvas != "string") {
-        throw new Error(`Can't find your canvas element: ${canvas}`);
-      }
-
-      const item = document.querySelector(canvas);
-      if (!item) {
-        throw new Error(`Can't find your canvas element: ${canvas}`);
-      }
-      if (!(item instanceof HTMLCanvasElement)) {
-        throw new Error(`The canvas: ${canvas} is not an HTMLCanvasElement`);
-      }
-      canvasDom = item;
+  private getCanvas(canvas: HTMLCanvasElement | string): HTMLCanvasElement {
+    if (canvas instanceof HTMLCanvasElement) return canvas;
+    const element = document.querySelector(canvas);
+    if (!(element instanceof HTMLCanvasElement)) {
+      throw new Error(`Cannot find canvas element or invalid: ${canvas}`);
     }
-
-    return canvasDom;
+    return element;
   }
 
-  checkFramesStartAndEnd(start: number, end: number): boolean {
-    let validate = false;
+  private checkFramesStartAndEnd(start: number, end: number): void {
     if (start >= end) {
       throw new Error(
-        `Your sequence frames start index: ${start} and end index: ${end}, seems illogical, start index > end index`,
+        `Start index ${start} cannot be greater than or equal to end index ${end}`,
       );
-    } else {
-      validate = true;
     }
-    return validate;
+
+    if (start < 0 || end < 0) {
+      throw new Error(`Start index ${start} and End index {end} cannot be < 0`);
+    }
+  }
+
+  private checkSequencesUrls(): void {
+    if (!this.desktopUrl || typeof this.desktopUrl !== "string") {
+      throw new Error("Invalid desktop URL");
+    }
+  }
+
+  private initializeCanvas(): void {
+    this.canvas = this.getCanvas(this.canvas);
+  }
+  private initializeTrigger(): void {
+    this.scrollTrigger = this.getScrubTrigger(this.scrollTrigger);
   }
 
   init(): void {
-    try {
-      this.scrollTrigger = this.getScrubTrigger(this.scrollTrigger);
-    } catch (e) {
-      console.error(e);
-      return;
-    }
-
-    try {
-      this.canvas = this.getCanvas(this.canvas);
-    } catch (e) {
-      console.error(e);
-      return;
-    }
-
-    try {
-      this.checkFramesStartAndEnd(this.startFrameNumber, this.endFrameNumber);
-    } catch (e) {
-      console.error(e);
-      return;
-    }
+    this.initializeTrigger();
+    this.initializeCanvas();
+    this.checkFramesStartAndEnd(this.startFrameNumber, this.endFrameNumber);
+    this.checkSequencesUrls();
 
     this.scrollObserver = new ScrollObserver(
       this.scrollTrigger,
