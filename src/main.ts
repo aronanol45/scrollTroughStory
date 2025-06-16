@@ -1,4 +1,4 @@
-import { ScrollTroughStory } from "./scroll-trough-story/main";
+import { ScrollThroughStory } from "./scroll-trough-story/main";
 
 // Setup our sequences paths
 const baseUrl: string = "/assets/sequences/mac/";
@@ -9,7 +9,7 @@ const mobileUrl: string = baseUrl + mobileUrlEnd;
 
 window.addEventListener("load", () => {
   /* Here some custom code*/
-  new ScrollTroughStory(
+  new ScrollThroughStory(
     "#hero-canvas",
     desktopUrl,
     mobileUrl,
