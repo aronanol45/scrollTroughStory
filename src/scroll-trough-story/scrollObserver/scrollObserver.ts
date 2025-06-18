@@ -1,4 +1,3 @@
-// Types pour une meilleure sécurité de type
 type ViewportPosition = "top" | "center" | "bottom";
 type ElementPosition = "top" | "center" | "bottom";
 type ScrubPosition = `${ElementPosition} ${ViewportPosition}`;
