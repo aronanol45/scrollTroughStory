@@ -1,7 +1,12 @@
 import { Emitter } from "./eventEmitter/eventEmitter.ts";
-import { ScrollObserver } from "./scrollObserver/scrollObserver.ts";
+import { ScrubScrollObserver } from "./scrollObserver/scrollObserver.ts";
 import { SequenceManager } from "./sequenceManager/sequenceManager.ts";
 import { type ScrollObserverOptions } from "./types.ts";
+
+// Types pour une meilleure sécurité de type
+type ViewportPosition = "top" | "center" | "bottom";
+type ElementPosition = "top" | "center" | "bottom";
+type ScrubPosition = `${ElementPosition} ${ViewportPosition}`;
 /**
  * Technical explanation
  * Manages a scroll-based animation sequence on a canvas element.
@@ -25,8 +30,8 @@ export class ScrollThroughStory {
   mobileUrl: string;
   startFrameNumber: number;
   endFrameNumber: number;
-  triggerStart: string;
-  triggerEnd: string;
+  triggerStart: ScrubPosition;
+  triggerEnd: ScrubPosition;
   constructor(
     canvas: HTMLCanvasElement | string,
     desktopUrl: string,
@@ -34,8 +39,8 @@ export class ScrollThroughStory {
     startFrameNumber: number,
     endFrameNumber: number,
     scrollTrigger: HTMLElement | string,
-    triggerStart: string,
-    triggerEnd: string,
+    triggerStart: ScrubPosition,
+    triggerEnd: ScrubPosition,
   ) {
     this.canvas = canvas;
     this.scrollTrigger = scrollTrigger;
@@ -105,7 +110,7 @@ export class ScrollThroughStory {
       );
     }
 
-    this.scrollObserver = new ScrollObserver(
+    this.scrollObserver = new ScrubScrollObserver(
       this.scrollTrigger,
       this.triggerStart,
       this.triggerEnd,
