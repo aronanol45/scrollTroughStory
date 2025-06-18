@@ -1,9 +1,10 @@
 //type scrubPosition = "top top" | "top bottom" | "bottom bottom" | "bottom top";
+// Define valid position types
 export class ScrollObserver {
   scrubTrigger: HTMLElement;
   scrubStart: string;
   scrubEnd: string;
-  scrollPercentage: number;
+  private scrollPercentage: number = 0;
   emitter: any;
   constructor(
     scrubTrigger: HTMLElement,
@@ -22,15 +23,17 @@ export class ScrollObserver {
   /**
    * Observe if the trigger is visible or not in the viewport
    **/
-  scrollObserver = (): void => {
+  private scrollObserver = (): void => {
     let observer = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
           //TODO: add scroll event listener here ?
           this.emitter.emit("scrollUpdate", { percentage: 0 });
+          //this.init();
         } else {
           //TODO: remove scroll event listener here ?
           this.emitter.emit("scrollUpdate", { percentage: 100 });
+          //this.destroy();
         }
       });
     });
@@ -41,14 +44,14 @@ export class ScrollObserver {
    * Pass the scroll Percentage to the parent trough scrollUpdate event
    * @param number Number scrollPercentage
    **/
-  sendScrollPercentage = (scrollPercentage: number) => {
+  private sendScrollPercentage = (scrollPercentage: number) => {
     this.emitter.emit("scrollUpdate", { percentage: scrollPercentage });
   };
 
   /**
    * Calculate element position relative to viewport
    **/
-  getElementPosition = (): void => {
+  private getElementPosition = (): void => {
     const [elementStartPosArg, viewportStartPosArg]: string[] =
       this.scrubStart.split(" ");
     const [elementEndPosArg, viewportEndPosArg]: string[] =
@@ -78,16 +81,18 @@ export class ScrollObserver {
     }
 
     const rect = this.scrubTrigger.getBoundingClientRect();
-    const elementTop: number = rect.top;
-    //const elementBottom: number = rect.bottom;
     const elementHeight: number = rect.height;
+
+    let elementTop: number = rect.top;
+    if (elementStartPosArg == "bottom") {
+      elementTop = rect.bottom;
+    }
+    if (elementStartPosArg == "center") {
+      elementTop = rect.top - elementHeight / 2;
+    }
 
     const startDelta: number =
       elementTop - viewportStartPos < 0 ? elementTop - viewportStartPos : 0; // get the amount of pixels the user scrolled trough our element
-    /*
-    const endDelta: number =
-      elementBottom - viewportEndPos > 0 ? elementBottom - viewportEndPos : 0;
-    */
 
     const pixelsToScroll = elementHeight + viewportStartPos + -viewportEndPos;
     const currentProgress = Math.abs(startDelta / pixelsToScroll);
@@ -98,18 +103,21 @@ export class ScrollObserver {
     }
   };
 
-  init = (): void => {
+  private init = (): void => {
     this.scrollObserver();
-    window.addEventListener("resize", this.getElementPosition);
+    window.addEventListener("resize", this.onResize);
     window.addEventListener("scroll", this.getElementPosition);
   };
 
-  onResize = (): void => {};
+  private onResize = (): void => {
+    this.getElementPosition;
+  };
 
   /**
    * Destroy all the events listener
    **/
-  destroy = (): void => {
-    window.removeEventListener("scroll", this.getElementPosition);
+  private destroy = (): void => {
+    //TODO: destroy all events listener
+    //window.removeEventListener("scroll", this.getElementPosition);
   };
 }

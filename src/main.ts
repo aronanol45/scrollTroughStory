@@ -16,7 +16,7 @@ window.addEventListener("load", () => {
     1,
     255,
     "#hero",
-    "top top",
+    "top center",
     "bottom bottom",
   );
 });

@@ -184,7 +184,9 @@ export class SequenceManager {
     ScaleToFill(image, this.canvas, this.context);
   };
 
+  //TODO: destroy everything instancied and stored
+  /*
   destroy = (): void => {
-    //TODO: destroy everything instancied and stored
   };
+  */
 }

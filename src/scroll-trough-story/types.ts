@@ -1,4 +1,27 @@
 type sequenceArray = HTMLImageElement[];
+
+export type ScrollObserverOptions = {
+  /**
+   * The HTMLElement used as scrub trigger
+   * @default canvas.parentElement
+   **
+  scrubTrigger: HTMLElement;
+  /**
+   * The scrubTrigger's position to start the scrub
+   * @default Top Top
+   **/
+  scrubStart: string;
+  /**
+   * The scrubTrigger's position to start the scrub
+   * @default Bottom Bottom
+   **/
+  scrubEnd: string;
+  /**
+   * Instance of EventEmitter shared betwen SequenceManager and ScrollObserver
+   **/
+  emitter: any;
+};
+
 export type scrollTroughStoryOptions = {
   /**
    * The canvas in which one we will draw our images sequence

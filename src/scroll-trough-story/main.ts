@@ -1,7 +1,7 @@
 import { Emitter } from "./eventEmitter/eventEmitter.ts";
 import { ScrollObserver } from "./scrollObserver/scrollObserver.ts";
 import { SequenceManager } from "./sequenceManager/sequenceManager.ts";
-
+import { type ScrollObserverOptions } from "./types.ts";
 /**
  * Technical explanation
  * Manages a scroll-based animation sequence on a canvas element.
@@ -18,7 +18,7 @@ import { SequenceManager } from "./sequenceManager/sequenceManager.ts";
 export class ScrollThroughStory {
   canvas: HTMLCanvasElement | string;
   emitter: Emitter;
-  scrollObserver: any;
+  scrollObserver: ScrollObserverOptions | undefined;
   scrollTrigger: HTMLElement | string;
   sequenceManager: any;
   desktopUrl: string;
@@ -46,7 +46,6 @@ export class ScrollThroughStory {
     this.emitter = new Emitter();
     this.triggerStart = triggerStart;
     this.triggerEnd = triggerEnd;
-    this.scrollObserver;
     this.sequenceManager;
     this.init();
   }
@@ -100,6 +99,12 @@ export class ScrollThroughStory {
     this.checkFramesStartAndEnd(this.startFrameNumber, this.endFrameNumber);
     this.checkSequencesUrls();
 
+    if (!(this.scrollTrigger instanceof HTMLElement)) {
+      throw new Error(
+        `Cannot find scroll trigger element: ${this.scrollTrigger}`,
+      );
+    }
+
     this.scrollObserver = new ScrollObserver(
       this.scrollTrigger,
       this.triggerStart,
@@ -107,6 +112,9 @@ export class ScrollThroughStory {
       this.emitter,
     );
 
+    if (!(this.canvas instanceof HTMLCanvasElement)) {
+      throw new Error(`Cannot find canvas element or invalid: ${this.canvas}`);
+    }
     this.sequenceManager = new SequenceManager(
       this.canvas,
       this.desktopUrl,
